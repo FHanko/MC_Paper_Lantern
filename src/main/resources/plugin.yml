@@ -2,8 +2,18 @@ name: Lantern
 version: '${version}'
 main: io.github.fhanko.lantern.Lantern
 api-version: '1.20'
+author: Flomich
 
 commands:
   lantern:
     description: "Adds lantern with <id> to your inventory."
     usage: "/lantern <id>"
+    permission: lantern.lantern
+
+permissions:
+  lantern.lantern:
+    description: Allows you to use the lantern command to generate lanterns.
+    default: op
+  lantern.use:
+    description: Allows you interact with lanterns.
+    default: true

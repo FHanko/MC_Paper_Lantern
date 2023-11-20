@@ -29,14 +29,13 @@ class Lantern : JavaPlugin(), Listener {
 
     @EventHandler
     fun onBreak(e: BlockBreakEvent) {
-        val lightPower = BlockBase.readBlock(e.block, LIGHT_KEY, PersistentDataType.INTEGER) ?: return
-        Schedulable.nextTick({_ -> Util.placeLight(e.block.location, lightPower) })
+        val lightPower = LanternBlock.lightData.getBlock(e.block) ?: return
+        Schedulable.nextTick({_ -> LanternBlock.placeLight(e.block.location, lightPower) })
     }
 
     @EventHandler
     fun onDestroy(e: CustomBlockDataRemoveEvent) {
-        val data = CustomBlockData(e.block, KPlugin.instance)
-        if (!data.has(LIGHT_KEY)) return
-        Schedulable.nextTick({ _ -> copyPdc(data, CustomBlockData(e.block.world.getBlockAt(e.block.location), KPlugin.instance)) })
+        val lightPower = LanternBlock.lightData.getBlock(e.block) ?: return
+        Schedulable.nextTick({ _ -> LanternBlock.lightData.setBlock(e.block.world.getBlockAt(e.block.location), lightPower) })
     }
 }
