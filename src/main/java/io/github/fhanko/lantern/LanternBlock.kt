@@ -8,6 +8,7 @@ import io.github.fhanko.kplugin.items.ItemData
 import io.github.fhanko.kplugin.items.handler.ClickHandler
 import io.github.fhanko.kplugin.util.mm
 import net.kyori.adventure.text.Component
+import net.minecraft.util.Mth
 import org.bukkit.Bukkit
 import org.bukkit.Location
 import org.bukkit.Material
@@ -15,6 +16,7 @@ import org.bukkit.block.Block
 import org.bukkit.block.BlockFace
 import org.bukkit.block.data.type.Light
 import org.bukkit.configuration.serialization.ConfigurationSerializable
+import org.bukkit.event.block.BlockBreakEvent
 import org.bukkit.event.block.BlockPistonExtendEvent
 import org.bukkit.event.block.BlockPistonRetractEvent
 import org.bukkit.event.block.BlockPlaceEvent
@@ -23,6 +25,7 @@ import org.bukkit.persistence.PersistentDataType
 
 open class LanternBlock(textures: MutableList<String>, private val lightStrengths: List<Int>, id: Int, name: Component, lore: List<Component>)
     : AnimatedBlock(textures,id, Material.ACACIA_PLANKS, name, lore), ClickHandler, MoveHandler, ConfigurationSerializable {
+    override val opaque = true
     companion object {
         private val faces = listOf(BlockFace.UP, BlockFace.DOWN, BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH)
         val lightData = ItemData(PersistentDataType.INTEGER, "lightData")
@@ -62,6 +65,11 @@ open class LanternBlock(textures: MutableList<String>, private val lightStrength
         }
     }
 
+    override fun broke(e: BlockBreakEvent) {
+        super.broke(e)
+        lightData.removeBlock(e.block)
+    }
+
     override fun place(e: BlockPlaceEvent) {
         super.place(e)
         updateLight(e.block, lightStrengths.getOrElse(0) { _ -> 0 })
@@ -82,11 +90,11 @@ open class LanternBlock(textures: MutableList<String>, private val lightStrength
     @Suppress("UNCHECKED_CAST")
     constructor(map: MutableMap<String, Any>) : this(
         map["textures"] as MutableList<String>,
-        map["light"] as List<Int>,
+        (map["light"] as List<Int>).map { Mth.clamp(it, 0, 15) },
         (map["id"] as Int),
         mm.deserialize(map["name"] as String),
         (map["lore"] as List<String>).map { mm.deserialize(it) }
-    ) { }
+    )
 
     override fun serialize(): MutableMap<String, Any> { return HashMap() }
 }

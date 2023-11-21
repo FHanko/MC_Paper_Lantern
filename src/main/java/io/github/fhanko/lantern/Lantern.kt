@@ -1,17 +1,14 @@
 package io.github.fhanko.lantern
 
-import com.jeff_media.customblockdata.CustomBlockData
 import com.jeff_media.customblockdata.events.CustomBlockDataRemoveEvent
 import io.github.fhanko.kplugin.KPlugin
-import io.github.fhanko.kplugin.blocks.BlockBase
 import io.github.fhanko.kplugin.util.Schedulable
-import io.github.fhanko.kplugin.util.copyPdc
+import org.bstats.bukkit.Metrics
 import org.bukkit.Bukkit
 import org.bukkit.configuration.serialization.ConfigurationSerialization
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
 import org.bukkit.event.block.BlockBreakEvent
-import org.bukkit.persistence.PersistentDataType
 import org.bukkit.plugin.java.JavaPlugin
 
 class Lantern : JavaPlugin(), Listener {
@@ -25,6 +22,8 @@ class Lantern : JavaPlugin(), Listener {
 
         val lanterns = config.get("lanterns") as List<MutableMap<String, Any>>
         lanterns.forEach { LanternBlock(it) }
+
+        val metrics = Metrics(this, 20354)
     }
 
     @EventHandler
