@@ -30,11 +30,16 @@ open class LanternBlock(textures: MutableList<String>, private val lightStrength
         private val faces = listOf(BlockFace.UP, BlockFace.DOWN, BlockFace.WEST, BlockFace.EAST, BlockFace.NORTH, BlockFace.SOUTH)
         val lightData = ItemData(PersistentDataType.INTEGER, "lightData")
         fun placeLight(location: Location, lightPower: Int) {
+            val block = location.world.getBlockAt(location)
+            lightData.setBlock(block, lightPower)
+            if (lightPower == 0) {
+                block.blockData = Bukkit.createBlockData(Material.AIR)
+                return
+            }
+
             val data = Bukkit.createBlockData(Material.LIGHT)
             (data as Light).apply { level = lightPower }
-            val block = location.world.getBlockAt(location)
             block.blockData = data
-            lightData.setBlock(block, lightPower)
         }
     }
 
